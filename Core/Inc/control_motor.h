@@ -13,12 +13,12 @@
 #include "stdlib.h"
 #include "math.h"
 
-//#define PWM0 TIM9->CCR1
-//#define PWM1 TIM9->CCR2
-//#define PWM2 TIM12->CCR1
-//#define Encoder0 TIM2->CNT
-//#define Encoder1 TIM3->CNT
-//#define Encoder2 TIM4->CNT
+#define PWM1 TIM9->CCR1
+#define PWM2 TIM9->CCR2
+#define PWM0 TIM12->CCR2
+//#define encoder[0] TIM2->CNT
+//#define encoder[1] TIM3->CNT
+//#define encoder[2] TIM4->CNT
 //#define KP_motor 1
 //#define KI_motor 0.145
 //#define KD_motor 20

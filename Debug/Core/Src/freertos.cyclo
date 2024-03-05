@@ -1,7 +1,5 @@
-freertos.c:107:6:vApplicationGetIdleTaskMemory	1
-freertos.c:121:6:MX_FREERTOS_Init	1
-freertos.c:180:6:StartTask01	9
-freertos.c:243:6:StartTask02	8
-freertos.c:301:6:StartTask03	1
-freertos.c:327:6:StartTask04	1
-freertos.c:345:6:StartTask05	1
+freertos.c:101:6:vApplicationGetIdleTaskMemory	1
+freertos.c:115:6:MX_FREERTOS_Init	1
+freertos.c:162:6:Startjoys_imuTask	11
+freertos.c:246:6:StartrosserialTask	1
+freertos.c:266:6:Startout_motorTask	26

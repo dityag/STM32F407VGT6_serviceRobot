@@ -25,15 +25,12 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-#include "adc.h"
-#include "can.h"
 #include "dma.h"
-#include "i2c.h"
-#include "spi.h"
 #include "tim.h"
 #include "usart.h"
 #include "gpio.h"
 #include "string.h"
+#include "mainpp.h"
 #include <control_motor.h>
 /* USER CODE END Includes */
 
@@ -55,45 +52,42 @@
 /* Private variables ---------------------------------------------------------*/
 /* USER CODE BEGIN Variables */
 //==================CONTROL MOTOR================//
-//extern int encoder[3];
-//extern short int motor_velo[3];
-//extern short int motor_SetPoint[3];
-//extern float proportional_motor[3], integral_motor[3], derivative_motor[3];
-//extern float prev_enc[3], error_velo_motor[3], previous_error_velo_motor[3];
-extern float outputPWM[3];
 extern short int motor_SetPoint[3];
+extern float outputPWM[3];
+extern float outputPWM_comm[3];
+extern float outputPWM_stm[3];
 
 //=====================JOYSTICK RC==================//
-extern uint8_t joystick_buf[14];
+extern uint8_t joystick_buf[13];
 extern uint8_t joystick_x_buf, joystick_y_buf, joystick_z_buf;
 extern int8_t joystick_x, joystick_y, joystick_z;
-//extern int i;
 extern int  joystick_bt_timeout, joystick_bt_counter;
+extern int joystick_mode, mode;
+extern int joystick_increase_speed, joystick_decrease_speed, speed, lock_increase_speed, lock_decrease_speed;
 
-//================CONTROL MOTOR MODE RC================//
-extern int dummy;
-//extern int8_t kecepatan_x;
-//extern int8_t kecepatan_y;
-//extern int8_t kecepatan_z;
+//====================IMU BNO055=====================//
+extern char imu_buf[32];
+extern float euler_x;
+extern float euler_y;
+extern float euler_z;
+extern float quat_w;
+extern float quat_x;
+extern float quat_y;
+extern float quat_z;
 
 /* USER CODE END Variables */
-osThreadId Task01Handle;
-osThreadId Task02Handle;
-osThreadId Task03Handle;
-osThreadId Task04Handle;
-osThreadId Task05Handle;
-osMutexId Mutex01Handle;
+osThreadId joys_imuTaskHandle;
+osThreadId rosserialTaskHandle;
+osThreadId out_motorTaskHandle;
 
 /* Private function prototypes -----------------------------------------------*/
 /* USER CODE BEGIN FunctionPrototypes */
 
 /* USER CODE END FunctionPrototypes */
 
-void StartTask01(void const * argument);
-void StartTask02(void const * argument);
-void StartTask03(void const * argument);
-void StartTask04(void const * argument);
-void StartTask05(void const * argument);
+void Startjoys_imuTask(void const * argument);
+void StartrosserialTask(void const * argument);
+void Startout_motorTask(void const * argument);
 
 void MX_FREERTOS_Init(void); /* (MISRA C 2004 rule 8.1) */
 
@@ -122,10 +116,6 @@ void MX_FREERTOS_Init(void) {
   /* USER CODE BEGIN Init */
 
   /* USER CODE END Init */
-  /* Create the mutex(es) */
-  /* definition and creation of Mutex01 */
-  osMutexDef(Mutex01);
-  Mutex01Handle = osMutexCreate(osMutex(Mutex01));
 
   /* USER CODE BEGIN RTOS_MUTEX */
   /* add mutexes, ... */
@@ -144,25 +134,17 @@ void MX_FREERTOS_Init(void) {
   /* USER CODE END RTOS_QUEUES */
 
   /* Create the thread(s) */
-  /* definition and creation of Task01 */
-  osThreadDef(Task01, StartTask01, osPriorityNormal, 0, 1024);
-  Task01Handle = osThreadCreate(osThread(Task01), NULL);
+  /* definition and creation of joys_imuTask */
+  osThreadDef(joys_imuTask, Startjoys_imuTask, osPriorityNormal, 0, 128);
+  joys_imuTaskHandle = osThreadCreate(osThread(joys_imuTask), NULL);
 
-  /* definition and creation of Task02 */
-  osThreadDef(Task02, StartTask02, osPriorityNormal, 0, 128);
-  Task02Handle = osThreadCreate(osThread(Task02), NULL);
+  /* definition and creation of rosserialTask */
+  osThreadDef(rosserialTask, StartrosserialTask, osPriorityNormal, 0, 512);
+  rosserialTaskHandle = osThreadCreate(osThread(rosserialTask), NULL);
 
-  /* definition and creation of Task03 */
-  osThreadDef(Task03, StartTask03, osPriorityLow, 0, 128);
-  Task03Handle = osThreadCreate(osThread(Task03), NULL);
-
-  /* definition and creation of Task04 */
-  osThreadDef(Task04, StartTask04, osPriorityLow, 0, 128);
-  Task04Handle = osThreadCreate(osThread(Task04), NULL);
-
-  /* definition and creation of Task05 */
-  osThreadDef(Task05, StartTask05, osPriorityLow, 0, 128);
-  Task05Handle = osThreadCreate(osThread(Task05), NULL);
+  /* definition and creation of out_motorTask */
+  osThreadDef(out_motorTask, Startout_motorTask, osPriorityNormal, 0, 128);
+  out_motorTaskHandle = osThreadCreate(osThread(out_motorTask), NULL);
 
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
@@ -170,19 +152,19 @@ void MX_FREERTOS_Init(void) {
 
 }
 
-/* USER CODE BEGIN Header_StartTask01 */
+/* USER CODE BEGIN Header_Startjoys_imuTask */
 /**
-  * @brief  Function implementing the Task01 thread.
+  * @brief  Function implementing the joy_imuTask thread.
   * @param  argument: Not used
   * @retval None
   */
-/* USER CODE END Header_StartTask01 */
-void StartTask01(void const * argument)
+/* USER CODE END Header_Startjoys_imuTask */
+void Startjoys_imuTask(void const * argument)
 {
-  /* USER CODE BEGIN StartTask01 */
+  /* USER CODE BEGIN Startjoys_imuTask */
   /* Infinite loop */
   for(;;)
-  {
+  {	  //JOYSTICK BLUETOOTH
 	  if(joystick_bt_counter < joystick_bt_timeout){
 		  if(HAL_UART_Receive_DMA(&huart2, joystick_buf, sizeof(joystick_buf)) != HAL_OK){
 			  joystick_bt_counter++;
@@ -196,14 +178,14 @@ void StartTask01(void const * argument)
 		  joystick_bt_counter = 299;
 	  }
 
-	  if(joystick_buf[0] == 'E' && joystick_buf[1] == 'L' && joystick_buf[2] == 'K' && joystick_buf[3] == 'A'){
+	  if(joystick_buf[0] == 'i' && joystick_buf[1] == 't' && joystick_buf[2] == 's'){
 		  HAL_UART_Receive_DMA(&huart2, joystick_buf, sizeof(joystick_buf));
 
 		  HAL_GPIO_WritePin(LED2_GPIO_Port, LED2_Pin, GPIO_PIN_SET);
 
-		  memcpy(&joystick_y_buf, joystick_buf + 4, 1);
-		  memcpy(&joystick_x_buf, joystick_buf + 5, 1);
-		  memcpy(&joystick_z_buf, joystick_buf + 7, 1);
+		  memcpy(&joystick_y_buf, joystick_buf + 3, 1);
+		  memcpy(&joystick_x_buf, joystick_buf + 4, 1);
+		  memcpy(&joystick_z_buf, joystick_buf + 6, 1);
 
 		  joystick_x_buf = constrain(joystick_x_buf, 0, 246);
 		  joystick_y_buf = constrain(joystick_y_buf, 0, 246);
@@ -212,10 +194,14 @@ void StartTask01(void const * argument)
 		  joystick_x = map(joystick_x_buf, 0, 246, -123, 123);
 		  joystick_y = map(joystick_y_buf, 0, 246, -123, 123);
 		  joystick_z = map(joystick_z_buf, 0, 246, -123, 123);
+
+		  joystick_mode = joystick_buf[7];
+		  mode = joystick_buf[8];
+		  joystick_increase_speed = joystick_buf[9];
+		  joystick_decrease_speed = joystick_buf[10];
 	  }
 	  else{
 		  HAL_UART_Receive_DMA(&huart2, joystick_buf, sizeof(joystick_buf));
-
 		  joystick_x = 0;
 		  joystick_y = 0;
 		  joystick_z = 0;
@@ -228,135 +214,153 @@ void StartTask01(void const * argument)
 		  joystick_z = 0;
 		  HAL_GPIO_WritePin(LED2_GPIO_Port, LED2_Pin, GPIO_PIN_RESET);
 	  }
+
+	  //GYRO BNO055
+	  HAL_UART_Receive_DMA(&huart4, imu_buf, sizeof(imu_buf));
+	  if(imu_buf[0] == 'i' && imu_buf[1] == 't' && imu_buf[2] == 's'){
+		  memcpy(&euler_x, imu_buf + 3, 4);
+		  memcpy(&euler_y, imu_buf + 7, 4);
+		  memcpy(&euler_z, imu_buf + 11, 4);
+		  memcpy(&quat_w, imu_buf + 15, 4);
+		  memcpy(&quat_x, imu_buf + 19, 4);
+		  memcpy(&quat_y, imu_buf + 23, 4);
+		  memcpy(&quat_z, imu_buf + 27, 4);
+		  HAL_GPIO_WritePin(GPIOE, GPIO_PIN_13, GPIO_PIN_SET);
+		  HAL_GPIO_WritePin(GPIOE, GPIO_PIN_14, GPIO_PIN_SET);
+	  }else{
+		  HAL_GPIO_WritePin(GPIOE, GPIO_PIN_13, GPIO_PIN_RESET);
+		  HAL_GPIO_WritePin(GPIOE, GPIO_PIN_14, GPIO_PIN_RESET);
+	  }
     osDelay(1);
   }
-  /* USER CODE END StartTask01 */
+  /* USER CODE END Startjoys_imuTask */
 }
 
-/* USER CODE BEGIN Header_StartTask02 */
+/* USER CODE BEGIN Header_StartrosserialTask */
 /**
-* @brief Function implementing the Task02 thread.
+* @brief Function implementing the rosserialTask thread.
 * @param argument: Not used
 * @retval None
 */
-/* USER CODE END Header_StartTask02 */
-void StartTask02(void const * argument)
+/* USER CODE END Header_StartrosserialTask */
+void StartrosserialTask(void const * argument)
 {
-  /* USER CODE BEGIN StartTask02 */
+  /* USER CODE BEGIN StartrosserialTask */
+	setup();
   /* Infinite loop */
   for(;;)
   {
-	  //==============================================================================
-	  if (outputPWM[1] < 0){
-		  dummy = 0;
-		  HAL_GPIO_WritePin(MOTOR1A_GPIO_Port, MOTOR1A_Pin, GPIO_PIN_SET);
-		  HAL_GPIO_WritePin(MOTOR1B_GPIO_Port, MOTOR1B_Pin, GPIO_PIN_RESET);
-	  }
-	  else if (outputPWM[1] > 0){
-		  dummy = 1;
-		  HAL_GPIO_WritePin(MOTOR1A_GPIO_Port, MOTOR1A_Pin, GPIO_PIN_RESET);
-		  HAL_GPIO_WritePin(MOTOR1B_GPIO_Port, MOTOR1B_Pin, GPIO_PIN_SET);
-	  }
-	  //==============================================================================
-	  if (outputPWM[2] < 0){
-		  HAL_GPIO_WritePin(MOTOR2A_GPIO_Port, MOTOR2A_Pin, GPIO_PIN_SET);
-		  HAL_GPIO_WritePin(MOTOR2B_GPIO_Port, MOTOR2B_Pin, GPIO_PIN_RESET);
-	  }
-	  else if (outputPWM[2] > 0){
-		  HAL_GPIO_WritePin(MOTOR2A_GPIO_Port, MOTOR2A_Pin, GPIO_PIN_RESET);
-		  HAL_GPIO_WritePin(MOTOR2B_GPIO_Port, MOTOR2B_Pin, GPIO_PIN_SET);
-	  }
-	  //==============================================================================
-	  if (outputPWM[0] < 0){
-		  HAL_GPIO_WritePin(MOTOR3A_GPIO_Port, MOTOR3A_Pin, GPIO_PIN_SET);
-		  HAL_GPIO_WritePin(MOTOR3B_GPIO_Port, MOTOR3B_Pin, GPIO_PIN_RESET);
-	  }
-	  else if (outputPWM[0] > 0)
-	  {
-		  HAL_GPIO_WritePin(MOTOR3A_GPIO_Port, MOTOR3A_Pin, GPIO_PIN_RESET);
-		  HAL_GPIO_WritePin(MOTOR3B_GPIO_Port, MOTOR3B_Pin, GPIO_PIN_SET);
-	  }
-
-	  if(joystick_bt_counter == 299){
-		  outputPWM[0] = 0;
-		  outputPWM[1] = 0;
-		  outputPWM[2] = 0;
-	  }
-
-	  __HAL_TIM_SET_COMPARE(&htim9, TIM_CHANNEL_1, abs(motor_SetPoint[1]));
-	  __HAL_TIM_SET_COMPARE(&htim9, TIM_CHANNEL_2, abs(motor_SetPoint[2]));
-	  __HAL_TIM_SET_COMPARE(&htim12, TIM_CHANNEL_2, abs(motor_SetPoint[0]));
-	  osDelay(1);
+	loop();
+    osDelay(32);
   }
-  /* USER CODE END StartTask02 */
+  /* USER CODE END StartrosserialTask */
 }
 
-/* USER CODE BEGIN Header_StartTask03 */
+/* USER CODE BEGIN Header_Startout_motorTask */
 /**
-* @brief Function implementing the Task03 thread.
+* @brief Function implementing the out_motorTask thread.
 * @param argument: Not used
 * @retval None
 */
-/* USER CODE END Header_StartTask03 */
-void StartTask03(void const * argument)
+/* USER CODE END Header_Startout_motorTask */
+void Startout_motorTask(void const * argument)
 {
-  /* USER CODE BEGIN StartTask03 */
+  /* USER CODE BEGIN Startout_motorTask */
   /* Infinite loop */
   for(;;)
   {
-	HAL_GPIO_WritePin(GPIOE, GPIO_PIN_13, GPIO_PIN_SET);
-	HAL_GPIO_WritePin(GPIOE, GPIO_PIN_14, GPIO_PIN_SET);
-	HAL_GPIO_WritePin(GPIOE, GPIO_PIN_15, GPIO_PIN_SET);
-	osDelay(1000);
-	HAL_GPIO_WritePin(GPIOE, GPIO_PIN_13, GPIO_PIN_RESET);
-	HAL_GPIO_WritePin(GPIOE, GPIO_PIN_14, GPIO_PIN_RESET);
-	HAL_GPIO_WritePin(GPIOE, GPIO_PIN_15, GPIO_PIN_RESET);
-	osDelay(1000);
-    osDelay(1);
-  }
-  /* USER CODE END StartTask03 */
-}
+	  //=================CONTROL SPEED==================//
+	  	  if(joystick_increase_speed == 1 && lock_increase_speed == 0){
+	  		  speed++;
+	  		  lock_increase_speed = 1;
+	  	  }
+	  	  if(joystick_increase_speed == 0 && lock_increase_speed == 1){
+	  		  lock_increase_speed = 0;
+	  	  }
 
-/* USER CODE BEGIN Header_StartTask04 */
-/**
-* @brief Function implementing the Task04 thread.
-* @param argument: Not used
-* @retval None
-*/
-/* USER CODE END Header_StartTask04 */
-void StartTask04(void const * argument)
-{
-  /* USER CODE BEGIN StartTask04 */
-  /* Infinite loop */
-  for(;;)
-  {
-    osDelay(1);
-  }
-  /* USER CODE END StartTask04 */
-}
+	  	  if(joystick_decrease_speed == 1 && lock_decrease_speed == 0){
+	  		  speed--;
+	  		  lock_decrease_speed = 1;
+	  	  }
+	  	  if(joystick_decrease_speed == 0 && lock_decrease_speed == 1){
+	  		  lock_decrease_speed = 0;
+	    	  }
 
-/* USER CODE BEGIN Header_StartTask05 */
-/**
-* @brief Function implementing the Task05 thread.
-* @param argument: Not used
-* @retval None
-*/
-/* USER CODE END Header_StartTask05 */
-void StartTask05(void const * argument)
-{
-  /* USER CODE BEGIN StartTask05 */
-  /* Infinite loop */
-  for(;;)
-  {
-	  HAL_GPIO_WritePin(LED1_GPIO_Port, LED1_Pin, GPIO_PIN_SET);
-	  HAL_GPIO_WritePin(LD1_GPIO_Port, LD1_Pin, GPIO_PIN_SET);
-	  osDelay(100);
-	  HAL_GPIO_WritePin(LED1_GPIO_Port, LED1_Pin, GPIO_PIN_RESET);
-	  HAL_GPIO_WritePin(LD1_GPIO_Port, LD1_Pin, GPIO_PIN_RESET);
-	  osDelay(500);
-    osDelay(1);
+	  	  if(speed > 2){
+	  		  speed = 0;
+	  	  }
+	  	  if(speed < 0){
+	  		  speed = 2;
+	  	  }
+
+	  	  if(speed == 0){
+	  		  HAL_GPIO_WritePin(GPIOE, GPIO_PIN_15, GPIO_PIN_SET);
+	  		  HAL_GPIO_WritePin(GPIOA, GPIO_PIN_11, GPIO_PIN_RESET);
+	  		  HAL_GPIO_WritePin(GPIOA, GPIO_PIN_12, GPIO_PIN_RESET);
+	  	  }else if(speed == 1){
+	  		  HAL_GPIO_WritePin(GPIOE, GPIO_PIN_15, GPIO_PIN_RESET);
+	  		  HAL_GPIO_WritePin(GPIOA, GPIO_PIN_11, GPIO_PIN_SET);
+	  		  HAL_GPIO_WritePin(GPIOA, GPIO_PIN_12, GPIO_PIN_RESET);
+	  	  }else if(speed == 2){
+	  		  HAL_GPIO_WritePin(GPIOE, GPIO_PIN_15, GPIO_PIN_RESET);
+	  		  HAL_GPIO_WritePin(GPIOA, GPIO_PIN_11, GPIO_PIN_RESET);
+	  		  HAL_GPIO_WritePin(GPIOA, GPIO_PIN_12, GPIO_PIN_SET);
+	  	  }
+
+	  	  //=====================SELECT MODE COMM/STM=================//
+	  	  if(mode == 1){
+	  		  for(int i = 0; i <= 2; i++){
+	  			  outputPWM[i] = outputPWM_comm[i];
+	  		  }
+	  	  }
+	  	  else if(mode == 0){
+	  		  for(int i = 0; i <= 2; i++){
+	  			  outputPWM[i] = outputPWM_stm[i];
+	  		  }
+	  	  }
+	  	  //========================OUTPUT PWM===========================//
+	  	  if (outputPWM[0] < 0){
+	  		  HAL_GPIO_WritePin(MOTOR1A_GPIO_Port, MOTOR1A_Pin, GPIO_PIN_SET);
+	  		  HAL_GPIO_WritePin(MOTOR1B_GPIO_Port, MOTOR1B_Pin, GPIO_PIN_RESET);
+	  	 	  }
+	  	  else if (outputPWM[0] > 0){
+	   		  HAL_GPIO_WritePin(MOTOR1A_GPIO_Port, MOTOR1A_Pin, GPIO_PIN_RESET);
+	   		  HAL_GPIO_WritePin(MOTOR1B_GPIO_Port, MOTOR1B_Pin, GPIO_PIN_SET);
+	   	  }
+	   	  //==============================================================================
+	   	  if (outputPWM[1] < 0){
+	   		  HAL_GPIO_WritePin(MOTOR2A_GPIO_Port, MOTOR2A_Pin, GPIO_PIN_SET);
+	   		  HAL_GPIO_WritePin(MOTOR2B_GPIO_Port, MOTOR2B_Pin, GPIO_PIN_RESET);
+	   	  }
+	   	  else if (outputPWM[1] > 0){
+	   		  HAL_GPIO_WritePin(MOTOR2A_GPIO_Port, MOTOR2A_Pin, GPIO_PIN_RESET);
+	   		  HAL_GPIO_WritePin(MOTOR2B_GPIO_Port, MOTOR2B_Pin, GPIO_PIN_SET);
+	   	  }
+	   	  //==============================================================================
+	   	  if (outputPWM[2] < 0){
+	   		  HAL_GPIO_WritePin(MOTOR3A_GPIO_Port, MOTOR3A_Pin, GPIO_PIN_SET);
+	   		  HAL_GPIO_WritePin(MOTOR3B_GPIO_Port, MOTOR3B_Pin, GPIO_PIN_RESET);
+	   	  }
+	   	  else if (outputPWM[2] > 0)
+	   	  {
+	   		  HAL_GPIO_WritePin(MOTOR3A_GPIO_Port, MOTOR3A_Pin, GPIO_PIN_RESET);
+	   		  HAL_GPIO_WritePin(MOTOR3B_GPIO_Port, MOTOR3B_Pin, GPIO_PIN_SET);
+	   	  }
+
+	   	  //========================SAFETY CONTROL PWM=====================//
+	   	  if(joystick_bt_counter == 299 || joystick_mode == 0){
+	   		  outputPWM[0] = 0;
+	   		  outputPWM[1] = 0;
+	   		  outputPWM[2] = 0;
+	   	  }
+
+	   	  __HAL_TIM_SET_COMPARE(&htim9, TIM_CHANNEL_1, abs(outputPWM[0]));
+	   	  __HAL_TIM_SET_COMPARE(&htim9, TIM_CHANNEL_2, abs(outputPWM[1]));
+	   	  __HAL_TIM_SET_COMPARE(&htim12, TIM_CHANNEL_2, abs(outputPWM[2]));
+
+	   	  osDelay(1);
   }
-  /* USER CODE END StartTask05 */
+  /* USER CODE END Startout_motorTask */
 }
 
 /* Private application code --------------------------------------------------*/

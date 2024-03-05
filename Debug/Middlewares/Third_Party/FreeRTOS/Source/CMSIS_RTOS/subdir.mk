@@ -7,11 +7,11 @@
 C_SRCS += \
 ../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS/cmsis_os.c 
 
-OBJS += \
-./Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS/cmsis_os.o 
-
 C_DEPS += \
 ./Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS/cmsis_os.d 
+
+OBJS += \
+./Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS/cmsis_os.o 
 
 
 # Each subdirectory must supply rules for building sources it contributes

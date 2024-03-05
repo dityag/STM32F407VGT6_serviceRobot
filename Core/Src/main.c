@@ -19,11 +19,7 @@
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 #include "cmsis_os.h"
-#include "adc.h"
-#include "can.h"
 #include "dma.h"
-#include "i2c.h"
-#include "spi.h"
 #include "tim.h"
 #include "usart.h"
 #include "gpio.h"
@@ -32,6 +28,7 @@
 /* USER CODE BEGIN Includes */
 #include "math.h"
 #include <control_motor.h>
+#include "mainpp.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -42,12 +39,14 @@
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
 //==================CONTROL MOTOR================//
-float KP_motor = 1 ;
-float KI_motor = 0.145 ;
-float KD_motor = 7 ;
+float KP_motor = 3 ;
+float KI_motor = 0 ;
+float KD_motor = 0 ;
 float PID_dt = 1 ;
 
+//================CONTROL MOTOR MODE RC================//
 int encoder[3];
+int encoder_external[2];
 short int motor_velo[3];
 short int motor_SetPoint[3];
 float proportional_motor[3], integral_motor[3], derivative_motor[3];
@@ -55,17 +54,30 @@ float prev_enc[3], error_velo_motor[3], previous_error_velo_motor[3];
 float outputPWM[3];
 
 //=====================JOYSTICK RC==================//
-uint8_t joystick_buf[14];
+uint8_t joystick_buf[13];
 uint8_t joystick_x_buf, joystick_y_buf, joystick_z_buf;
 int8_t joystick_x, joystick_y, joystick_z;
-int i;
-int joystick_bt_available, joystick_bt_timeout = 300, joystick_bt_counter = 0;
+int joystick_bt_timeout = 300, joystick_bt_counter = 0;
+int joystick_mode, mode;
+int joystick_increase_speed, joystick_decrease_speed, speed, lock_increase_speed, lock_decrease_speed;
 
-//================CONTROL MOTOR MODE RC================//
-int dummy;
-int8_t kecepatan_x;
-int8_t kecepatan_y;
-int8_t kecepatan_z;
+//====================IMU BNO055=====================//
+char imu_buf[32];
+float euler_x;
+float euler_y;
+float euler_z;
+float quat_w;
+float quat_x;
+float quat_y;
+float quat_z;
+
+//================COMMMUNICATION ROSSERIAL================//
+int32_t stm_to_comm[50];
+int32_t comm_to_stm[50];
+
+float outputPWM_comm[3];
+float outputPWM_stm[3];
+
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -97,6 +109,13 @@ void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim){
 	}
 	if(htim->Instance == TIM4){
 		encoder[2] = __HAL_TIM_GET_COUNTER(&htim4);
+	}
+
+	if(htim->Instance == TIM1){
+		encoder_external[0] = __HAL_TIM_GET_COUNTER(&htim1);
+	}
+	if(htim->Instance == TIM8){
+		encoder_external[1] = __HAL_TIM_GET_COUNTER(&htim8);
 	}
 }
 
@@ -131,25 +150,20 @@ int main(void)
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
   MX_DMA_Init();
-  MX_I2C1_Init();
   MX_TIM1_Init();
   MX_TIM9_Init();
   MX_TIM4_Init();
   MX_TIM3_Init();
   MX_UART4_Init();
-  MX_UART5_Init();
   MX_USART3_UART_Init();
-  MX_CAN1_Init();
-  MX_I2C2_Init();
-  MX_SPI1_Init();
   MX_TIM12_Init();
-  MX_ADC1_Init();
   MX_USART2_UART_Init();
   MX_TIM2_Init();
   MX_TIM8_Init();
   MX_USART1_UART_Init();
   MX_TIM7_Init();
   MX_TIM13_Init();
+  MX_UART5_Init();
   /* USER CODE BEGIN 2 */
   HAL_TIM_Base_Start_IT(&htim7);
   HAL_TIM_Base_Start_IT(&htim13);
@@ -167,8 +181,8 @@ int main(void)
   HAL_TIM_Encoder_Start_IT(&htim3,TIM_CHANNEL_ALL);
   HAL_TIM_Encoder_Start_IT(&htim4,TIM_CHANNEL_ALL);
 
-  //=============JOYSTICK RC==============
-//  HAL_UART_Receive_DMA(&huart2, joystick_buf, sizeof(joystick_buf));
+  HAL_TIM_Encoder_Start_IT(&htim1,TIM_CHANNEL_ALL);
+  HAL_TIM_Encoder_Start_IT(&htim8,TIM_CHANNEL_ALL);
   /* USER CODE END 2 */
 
   /* Call init function for freertos objects (in freertos.c) */
@@ -235,24 +249,7 @@ void SystemClock_Config(void)
 }
 
 /* USER CODE BEGIN 4 */
-void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart)
-{
-   // do nothing here
-}
 
-void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart){
-	if(huart->Instance == USART2){
-//		for (i = 0; i<=14 ; i++){
-//			if(joystick_buf[i] == 'E' && joystick_buf[i+1] == 'L' && joystick_buf[i+2] == 'K' && joystick_buf[i+3] == 'A'){
-//				HAL_UART_Receive_DMA(&huart2, joystick_buf, sizeof(joystick_buf));
-//				joystick_bt_available = 1;
-//			}
-//			else{
-//				HAL_UART_Receive_DMA(&huart2, joystick_buf, sizeof(joystick_buf));
-//			}
-//		}
-	}
-}
 /* USER CODE END 4 */
 
 /**

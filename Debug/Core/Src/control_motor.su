@@ -1,3 +1,3 @@
-../Core/Src/control_motor.c:28:6:map	24	static
-../Core/Src/control_motor.c:32:6:motor_VectorKinematic	24	static
-../Core/Src/control_motor.c:42:6:motor_VeloControl	16	static
+../Core/Src/control_motor.c:24:6:map	24	static
+../Core/Src/control_motor.c:28:6:motor_VectorKinematic	24	static
+../Core/Src/control_motor.c:35:6:motor_VeloControl	16	static
