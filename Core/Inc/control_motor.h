@@ -13,9 +13,9 @@
 #include "stdlib.h"
 #include "math.h"
 
-#define PWM1 TIM9->CCR1
-#define PWM2 TIM9->CCR2
-#define PWM0 TIM12->CCR2
+//#define PWM1 TIM9->CCR1
+//#define PWM2 TIM9->CCR2
+//#define PWM0 TIM12->CCR2
 //#define encoder[0] TIM2->CNT
 //#define encoder[1] TIM3->CNT
 //#define encoder[2] TIM4->CNT

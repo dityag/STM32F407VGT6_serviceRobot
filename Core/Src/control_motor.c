@@ -19,7 +19,7 @@ extern short int motor_velo[3];
 extern short int motor_SetPoint[3];
 extern float proportional_motor[3], integral_motor[3], derivative_motor[3];
 extern float prev_enc[3], error_velo_motor[3], previous_error_velo_motor[3];
-extern float outputPWM_stm[3];
+extern float outputPWM[3];
 
 long map(long x, long in_min, long in_max, long out_min, long out_max) {
   return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
@@ -27,9 +27,9 @@ long map(long x, long in_min, long in_max, long out_min, long out_max) {
 
 void motor_VectorKinematic(short int vx, short int vy, short int vsudut)
 {
-	motor_SetPoint[0] = (short int) (((vx) * cosf(0 * M_PI/180)) + (vsudut*0.8));
-	motor_SetPoint[1] = (short int) (((vx) * cosf(240 * M_PI/180)) + ((vy*-1.4) * sinf(240 * M_PI/180)) + (vsudut*0.3));
-	motor_SetPoint[2] = (short int) (((vx) * cosf(120 * M_PI/180)) + ((vy*-1.4) * sinf(120 * M_PI/180)) + (vsudut*0.3));
+	motor_SetPoint[0] = (short int) (((vx) * cosf(0 * M_PI/180)) + (vsudut));
+	motor_SetPoint[1] = (short int) (((vx) * cosf(240 * M_PI/180)) + ((vy) * sinf(240 * M_PI/180)) + (vsudut));
+	motor_SetPoint[2] = (short int) (((vx) * cosf(120 * M_PI/180)) + ((vy) * sinf(120 * M_PI/180)) + (vsudut));
 }
 
 void motor_VeloControl(void)
@@ -57,10 +57,10 @@ void motor_VeloControl(void)
 		else if(integral_motor[i] < -999) integral_motor[i] = -999;
 
 //		outputPWM[i] = (proportional_motor[i] + integral_motor[i] + derivative_motor[i]) * 0.9;
-		outputPWM_stm[i] = proportional_motor[i] * 0.3;
+		outputPWM[i] = proportional_motor[i] * 0.3;
 
-		if(outputPWM_stm[i] > 999) outputPWM_stm[i] = 999;
-		else if(outputPWM_stm[i] < -999) outputPWM_stm[i] = -999;
+		if(outputPWM[i] > 999) outputPWM[i] = 999;
+		else if(outputPWM[i] < -999) outputPWM[i] = -999;
 //		prev_enc[i] = encoder[i];
 //		previous_error_velo_motor[i] = error_velo_motor[i];
 	}

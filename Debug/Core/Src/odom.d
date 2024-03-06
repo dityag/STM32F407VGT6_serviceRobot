@@ -1,13 +1,4 @@
-Core/Src/freertos.o: ../Core/Src/freertos.c \
- ../Middlewares/Third_Party/FreeRTOS/Source/include/FreeRTOS.h \
- ../Core/Inc/FreeRTOSConfig.h \
- ../Middlewares/Third_Party/FreeRTOS/Source/include/projdefs.h \
- ../Middlewares/Third_Party/FreeRTOS/Source/include/portable.h \
- ../Middlewares/Third_Party/FreeRTOS/Source/include/deprecated_definitions.h \
- ../Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM4F/portmacro.h \
- ../Middlewares/Third_Party/FreeRTOS/Source/include/mpu_wrappers.h \
- ../Middlewares/Third_Party/FreeRTOS/Source/include/task.h \
- ../Middlewares/Third_Party/FreeRTOS/Source/include/list.h \
+Core/Src/odom.o: ../Core/Src/odom.cpp ../Core/Inc/odom.h \
  ../Core/Inc/main.h ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal.h \
  ../Core/Inc/stm32f4xx_hal_conf.h \
  ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_rcc.h \
@@ -36,26 +27,25 @@ Core/Src/freertos.o: ../Core/Src/freertos.c \
  ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim.h \
  ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim_ex.h \
  ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_uart.h \
- ../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS/cmsis_os.h \
- ../Middlewares/Third_Party/FreeRTOS/Source/include/timers.h \
- ../Middlewares/Third_Party/FreeRTOS/Source/include/task.h \
- ../Middlewares/Third_Party/FreeRTOS/Source/include/queue.h \
- ../Middlewares/Third_Party/FreeRTOS/Source/include/semphr.h \
- ../Middlewares/Third_Party/FreeRTOS/Source/include/queue.h \
- ../Middlewares/Third_Party/FreeRTOS/Source/include/event_groups.h \
- ../Middlewares/Third_Party/FreeRTOS/Source/include/timers.h \
- ../Core/Inc/dma.h ../Core/Inc/main.h ../Core/Inc/tim.h \
- ../Core/Inc/usart.h ../Core/Inc/gpio.h ../Core/Inc/mainpp.h \
- ../Core/Inc/odometry.h ../Core/Inc/control_motor.h
-../Middlewares/Third_Party/FreeRTOS/Source/include/FreeRTOS.h:
-../Core/Inc/FreeRTOSConfig.h:
-../Middlewares/Third_Party/FreeRTOS/Source/include/projdefs.h:
-../Middlewares/Third_Party/FreeRTOS/Source/include/portable.h:
-../Middlewares/Third_Party/FreeRTOS/Source/include/deprecated_definitions.h:
-../Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM4F/portmacro.h:
-../Middlewares/Third_Party/FreeRTOS/Source/include/mpu_wrappers.h:
-../Middlewares/Third_Party/FreeRTOS/Source/include/task.h:
-../Middlewares/Third_Party/FreeRTOS/Source/include/list.h:
+ ../Core/Inc/mainpp.h ../Core/Inc/ros/time.h ../Core/Inc/ros/duration.h \
+ ../Core/Inc/nav_msgs/Odometry.h ../Core/Inc/ros/msg.h \
+ ../Core/Inc/std_msgs/Header.h \
+ ../Core/Inc/geometry_msgs/PoseWithCovariance.h \
+ ../Core/Inc/geometry_msgs/Pose.h ../Core/Inc/geometry_msgs/Point.h \
+ ../Core/Inc/geometry_msgs/Quaternion.h \
+ ../Core/Inc/geometry_msgs/TwistWithCovariance.h \
+ ../Core/Inc/geometry_msgs/Twist.h ../Core/Inc/geometry_msgs/Vector3.h \
+ ../Core/Inc/geometry_msgs/TransformStamped.h \
+ ../Core/Inc/geometry_msgs/Transform.h \
+ ../Core/Inc/tf/transform_broadcaster.h ../Core/Inc/ros.h \
+ ../Core/Inc/ros/node_handle.h ../Core/Inc/std_msgs/Time.h \
+ ../Core/Inc/rosserial_msgs/TopicInfo.h ../Core/Inc/rosserial_msgs/Log.h \
+ ../Core/Inc/rosserial_msgs/RequestParam.h ../Core/Inc/ros/publisher.h \
+ ../Core/Inc/ros/node_handle.h ../Core/Inc/ros/subscriber.h \
+ ../Core/Inc/ros/service_server.h ../Core/Inc/ros/service_client.h \
+ ../Core/Inc/STM32Hardware.h ../Core/Inc/tf/tfMessage.h \
+ ../Core/Inc/tf/tf.h
+../Core/Inc/odom.h:
 ../Core/Inc/main.h:
 ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal.h:
 ../Core/Inc/stm32f4xx_hal_conf.h:
@@ -85,19 +75,33 @@ Core/Src/freertos.o: ../Core/Src/freertos.c \
 ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim.h:
 ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim_ex.h:
 ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_uart.h:
-../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS/cmsis_os.h:
-../Middlewares/Third_Party/FreeRTOS/Source/include/timers.h:
-../Middlewares/Third_Party/FreeRTOS/Source/include/task.h:
-../Middlewares/Third_Party/FreeRTOS/Source/include/queue.h:
-../Middlewares/Third_Party/FreeRTOS/Source/include/semphr.h:
-../Middlewares/Third_Party/FreeRTOS/Source/include/queue.h:
-../Middlewares/Third_Party/FreeRTOS/Source/include/event_groups.h:
-../Middlewares/Third_Party/FreeRTOS/Source/include/timers.h:
-../Core/Inc/dma.h:
-../Core/Inc/main.h:
-../Core/Inc/tim.h:
-../Core/Inc/usart.h:
-../Core/Inc/gpio.h:
 ../Core/Inc/mainpp.h:
-../Core/Inc/odometry.h:
-../Core/Inc/control_motor.h:
+../Core/Inc/ros/time.h:
+../Core/Inc/ros/duration.h:
+../Core/Inc/nav_msgs/Odometry.h:
+../Core/Inc/ros/msg.h:
+../Core/Inc/std_msgs/Header.h:
+../Core/Inc/geometry_msgs/PoseWithCovariance.h:
+../Core/Inc/geometry_msgs/Pose.h:
+../Core/Inc/geometry_msgs/Point.h:
+../Core/Inc/geometry_msgs/Quaternion.h:
+../Core/Inc/geometry_msgs/TwistWithCovariance.h:
+../Core/Inc/geometry_msgs/Twist.h:
+../Core/Inc/geometry_msgs/Vector3.h:
+../Core/Inc/geometry_msgs/TransformStamped.h:
+../Core/Inc/geometry_msgs/Transform.h:
+../Core/Inc/tf/transform_broadcaster.h:
+../Core/Inc/ros.h:
+../Core/Inc/ros/node_handle.h:
+../Core/Inc/std_msgs/Time.h:
+../Core/Inc/rosserial_msgs/TopicInfo.h:
+../Core/Inc/rosserial_msgs/Log.h:
+../Core/Inc/rosserial_msgs/RequestParam.h:
+../Core/Inc/ros/publisher.h:
+../Core/Inc/ros/node_handle.h:
+../Core/Inc/ros/subscriber.h:
+../Core/Inc/ros/service_server.h:
+../Core/Inc/ros/service_client.h:
+../Core/Inc/STM32Hardware.h:
+../Core/Inc/tf/tfMessage.h:
+../Core/Inc/tf/tf.h:

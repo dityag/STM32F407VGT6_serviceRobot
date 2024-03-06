@@ -31,6 +31,7 @@
 #include "gpio.h"
 #include "string.h"
 #include "mainpp.h"
+#include <odometry.h>
 #include <control_motor.h>
 /* USER CODE END Includes */
 
@@ -52,10 +53,10 @@
 /* Private variables ---------------------------------------------------------*/
 /* USER CODE BEGIN Variables */
 //==================CONTROL MOTOR================//
-extern short int motor_SetPoint[3];
+//extern short int motor_SetPoint[3];
 extern float outputPWM[3];
-extern float outputPWM_comm[3];
-extern float outputPWM_stm[3];
+//extern float outputPWM_comm[3];
+//extern float outputPWM_stm[3];
 
 //=====================JOYSTICK RC==================//
 extern uint8_t joystick_buf[13];
@@ -74,6 +75,13 @@ extern float quat_w;
 extern float quat_x;
 extern float quat_y;
 extern float quat_z;
+
+//===============ODOMETRY================//
+extern short int x_velocity;
+extern short int y_velocity;
+extern short int angular_velocity;
+
+extern uint32_t tick;
 
 /* USER CODE END Variables */
 osThreadId joys_imuTaskHandle;
@@ -139,7 +147,7 @@ void MX_FREERTOS_Init(void) {
   joys_imuTaskHandle = osThreadCreate(osThread(joys_imuTask), NULL);
 
   /* definition and creation of rosserialTask */
-  osThreadDef(rosserialTask, StartrosserialTask, osPriorityNormal, 0, 512);
+  osThreadDef(rosserialTask, StartrosserialTask, osPriorityNormal, 0, 2048);
   rosserialTaskHandle = osThreadCreate(osThread(rosserialTask), NULL);
 
   /* definition and creation of out_motorTask */
@@ -250,8 +258,12 @@ void StartrosserialTask(void const * argument)
   /* Infinite loop */
   for(;;)
   {
-	loop();
-    osDelay(32);
+//	  calculate_odometry();
+//	  loop();
+//    osDelay(20);
+	  tick++;
+	  loop();
+	  osDelay(20);
   }
   /* USER CODE END StartrosserialTask */
 }
@@ -309,14 +321,10 @@ void Startout_motorTask(void const * argument)
 
 	  	  //=====================SELECT MODE COMM/STM=================//
 	  	  if(mode == 1){
-	  		  for(int i = 0; i <= 2; i++){
-	  			  outputPWM[i] = outputPWM_comm[i];
-	  		  }
+	  		motor_VectorKinematic(x_velocity, y_velocity, angular_velocity);
 	  	  }
 	  	  else if(mode == 0){
-	  		  for(int i = 0; i <= 2; i++){
-	  			  outputPWM[i] = outputPWM_stm[i];
-	  		  }
+	  		motor_VectorKinematic(joystick_x, joystick_y, joystick_z);
 	  	  }
 	  	  //========================OUTPUT PWM===========================//
 	  	  if (outputPWM[0] < 0){

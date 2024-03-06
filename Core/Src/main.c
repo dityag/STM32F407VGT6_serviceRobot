@@ -46,7 +46,6 @@ float PID_dt = 1 ;
 
 //================CONTROL MOTOR MODE RC================//
 int encoder[3];
-int encoder_external[2];
 short int motor_velo[3];
 short int motor_SetPoint[3];
 float proportional_motor[3], integral_motor[3], derivative_motor[3];
@@ -71,12 +70,31 @@ float quat_x;
 float quat_y;
 float quat_z;
 
-//================COMMMUNICATION ROSSERIAL================//
-int32_t stm_to_comm[50];
-int32_t comm_to_stm[50];
+//====================ODOMETRY=========================//
+int odometry[2];
+float x_buffer_position = 0, y_buffer_position = 0;
+float x_offset_position = 0, y_offset_position = 0;
+float x_position = 0, y_position = 0;
 
-float outputPWM_comm[3];
-float outputPWM_stm[3];
+float gyro_buffer, gyro_offset = 90;
+float gyro_angle = 90, gyro_radian = 1.5707963268; // 1/2*phi
+
+short int x_velocity;
+short int y_velocity;
+short int angular_velocity;
+
+//================COMMMUNICATION ROSSERIAL================//
+//int32_t stm_to_comm[50];
+//int32_t comm_to_stm[50];
+
+//float outputPWM_comm[3];
+//float outputPWM_stm[3];
+
+unsigned long int t0_ros;
+unsigned long int t1_ros;
+
+uint32_t tick;
+uint32_t test;
 
 /* USER CODE END PD */
 
@@ -112,10 +130,10 @@ void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim){
 	}
 
 	if(htim->Instance == TIM1){
-		encoder_external[0] = __HAL_TIM_GET_COUNTER(&htim1);
+		odometry[0] = __HAL_TIM_GET_COUNTER(&htim1);
 	}
 	if(htim->Instance == TIM8){
-		encoder_external[1] = __HAL_TIM_GET_COUNTER(&htim8);
+		odometry[1] = __HAL_TIM_GET_COUNTER(&htim8);
 	}
 }
 
@@ -267,7 +285,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 		motor_VeloControl();
 	}
 	if (htim->Instance == TIM13){
-		motor_VectorKinematic(joystick_x, joystick_y, joystick_z);
+//		motor_VectorKinematic(joystick_x, joystick_y, joystick_z);
 	}
   /* USER CODE END Callback 0 */
   if (htim->Instance == TIM6) {
