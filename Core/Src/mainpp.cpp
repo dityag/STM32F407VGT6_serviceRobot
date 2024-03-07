@@ -18,7 +18,7 @@
 ros::NodeHandle  nh;
 
 #define ODO_PERIOD 10  // Millis between /tf and /odom publication
-#define PID_PERIOD  50  // Millis between each PID calculation
+#define PID_PERIOD  10  // Millis between each PID calculation
 
 // TODO:  meterPerTick needs to be computed from parameters in setup()
 // meter per encoder tick is wheel circumfrence / encoder ticks per wheel revoution
@@ -34,8 +34,8 @@ double leftInput,  leftOutput;
 double rightSetpoint = 0.0;
 double rightInput, rightOutput;
 
-const float meterPerTick = 0.0003828125;  // Woodie
-const float base_width   = 0.195;         // Woodie
+const float meterPerTick = (0.058 * M_PI) / 1000;  // Woodie
+const float base_width   = 0.44;         // Woodie
 
 long encoderLeftLastValue  = 0L;
 long encoderRightLastValue = 0L;

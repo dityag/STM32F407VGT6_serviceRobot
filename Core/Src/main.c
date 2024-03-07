@@ -71,7 +71,7 @@ float quat_y;
 float quat_z;
 
 //====================ODOMETRY=========================//
-int odometry[2];
+int odometry[2] = {32768, 32768};
 float x_buffer_position = 0, y_buffer_position = 0;
 float x_offset_position = 0, y_offset_position = 0;
 float x_position = 0, y_position = 0;

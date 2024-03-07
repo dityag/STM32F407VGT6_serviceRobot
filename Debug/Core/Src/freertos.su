@@ -1,5 +1,5 @@
-../Core/Src/freertos.c:109:6:vApplicationGetIdleTaskMemory	24	static
-../Core/Src/freertos.c:123:6:MX_FREERTOS_Init	104	static
-../Core/Src/freertos.c:170:6:Startjoys_imuTask	24	static
-../Core/Src/freertos.c:254:6:StartrosserialTask	16	static
-../Core/Src/freertos.c:278:6:Startout_motorTask	16	static
+../Core/Src/freertos.c:108:6:vApplicationGetIdleTaskMemory	24	static
+../Core/Src/freertos.c:122:6:MX_FREERTOS_Init	104	static
+../Core/Src/freertos.c:169:6:Startjoys_imuTask	24	static
+../Core/Src/freertos.c:253:6:StartrosserialTask	16	static
+../Core/Src/freertos.c:277:6:Startout_motorTask	16	static
