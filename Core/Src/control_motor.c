@@ -21,7 +21,7 @@ extern float proportional_motor[3], integral_motor[3], derivative_motor[3];
 extern float prev_enc[3], error_velo_motor[3], previous_error_velo_motor[3];
 extern float outputPWM[3];
 
-long map(long x, long in_min, long in_max, long out_min, long out_max) {
+float map(float x, float in_min, float in_max, float out_min, float out_max) {
   return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
 }
 

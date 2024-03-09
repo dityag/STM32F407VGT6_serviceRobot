@@ -39,7 +39,7 @@ void motor_VectorKinematic(short int vx, short int vy, short int vsudut);
 void motor_VeloControl(void);
 short calculatePID(short setpoint, float actual_value, float kp, float ki, float kd, short maxval, short minval,float errornow, float errorbfr, float max_err, float min_err, float dt);
 
-long map(long x, long in_min, long in_max, long out_min, long out_max);
+float map(float x, float in_min, float in_max, float out_min, float out_max);
 
 //void motor_SetPWM(short int outputPWM[3]);
 

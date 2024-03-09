@@ -44,6 +44,10 @@ float KI_motor = 0 ;
 float KD_motor = 0 ;
 float PID_dt = 1 ;
 
+float vel_x;
+float vel_y;
+float vel_th;
+
 //================CONTROL MOTOR MODE RC================//
 int encoder[3];
 short int motor_velo[3];
@@ -79,17 +83,11 @@ float x_position = 0, y_position = 0;
 float gyro_buffer, gyro_offset = 90;
 float gyro_angle = 90, gyro_radian = 1.5707963268; // 1/2*phi
 
-short int x_velocity;
-short int y_velocity;
-short int angular_velocity;
+float x_velocity;
+float y_velocity;
+float angular_velocity;
 
 //================COMMMUNICATION ROSSERIAL================//
-//int32_t stm_to_comm[50];
-//int32_t comm_to_stm[50];
-
-//float outputPWM_comm[3];
-//float outputPWM_stm[3];
-
 unsigned long int t0_ros;
 unsigned long int t1_ros;
 
@@ -152,7 +150,7 @@ int main(void)
   /* MCU Configuration--------------------------------------------------------*/
 
   /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
-  HAL_Init();
+///  HAL_Init();
 
   /* USER CODE BEGIN Init */
 

@@ -52,10 +52,10 @@
 /* Private variables ---------------------------------------------------------*/
 /* USER CODE BEGIN Variables */
 //==================CONTROL MOTOR================//
-//extern short int motor_SetPoint[3];
+extern float vel_x;
+extern float vel_y;
+extern float vel_th;
 extern float outputPWM[3];
-//extern float outputPWM_comm[3];
-//extern float outputPWM_stm[3];
 
 //=====================JOYSTICK RC==================//
 extern uint8_t joystick_buf[13];
@@ -76,9 +76,9 @@ extern float quat_y;
 extern float quat_z;
 
 //===============ODOMETRY================//
-extern short int x_velocity;
-extern short int y_velocity;
-extern short int angular_velocity;
+extern float x_velocity;
+extern float y_velocity;
+extern float angular_velocity;
 
 extern uint32_t tick;
 
@@ -238,6 +238,12 @@ void Startjoys_imuTask(void const * argument)
 		  HAL_GPIO_WritePin(GPIOE, GPIO_PIN_13, GPIO_PIN_RESET);
 		  HAL_GPIO_WritePin(GPIOE, GPIO_PIN_14, GPIO_PIN_RESET);
 	  }
+
+	  //CONTROL PC
+	  x_velocity 		= map(vel_x, -1, 1, -123, 123);
+	  y_velocity 		= map(vel_y, -1, 1, -123, 123);
+	  angular_velocity 	= map(vel_th, -1, 1, -123, 123);
+
     osDelay(1);
   }
   /* USER CODE END Startjoys_imuTask */
