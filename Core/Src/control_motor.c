@@ -27,9 +27,9 @@ long map(long x, long in_min, long in_max, long out_min, long out_max) {
 
 void motor_VectorKinematic(short int vx, short int vy, short int vsudut)
 {
-	motor_SetPoint[0] = (short int) (((vx) * cosf(0 * M_PI/180)) + (vsudut));
-	motor_SetPoint[1] = (short int) (((vx) * cosf(240 * M_PI/180)) + ((vy) * sinf(240 * M_PI/180)) + (vsudut));
-	motor_SetPoint[2] = (short int) (((vx) * cosf(120 * M_PI/180)) + ((vy) * sinf(120 * M_PI/180)) + (vsudut));
+	motor_SetPoint[0] = (short int) (((vx * 0.8) * cosf(0 * M_PI/180)) + (vsudut));
+	motor_SetPoint[1] = (short int) (((vx) * cosf(240 * M_PI/180)) + ((vy * 1.21) * sinf(240 * M_PI/180)) + (vsudut));
+	motor_SetPoint[2] = (short int) (((vx) * cosf(120 * M_PI/180)) + ((vy * 1.20) * sinf(120 * M_PI/180)) + (vsudut));
 }
 
 void motor_VeloControl(void)

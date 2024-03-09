@@ -320,35 +320,35 @@ void Startout_motorTask(void const * argument)
 
 	  	  //=====================SELECT MODE COMM/STM=================//
 	  	  if(mode == 1){
-	  		motor_VectorKinematic(x_velocity, y_velocity, angular_velocity);
+	  		motor_VectorKinematic(angular_velocity, y_velocity, x_velocity);
 	  	  }
 	  	  else if(mode == 0){
-	  		motor_VectorKinematic(joystick_x, joystick_y, joystick_z);
+	  		motor_VectorKinematic(joystick_z, joystick_y, joystick_x);
 	  	  }
 	  	  //========================OUTPUT PWM===========================//
-	  	  if (outputPWM[0] < 0){
+	  	  if (outputPWM[1] < 0){
 	  		  HAL_GPIO_WritePin(MOTOR1A_GPIO_Port, MOTOR1A_Pin, GPIO_PIN_SET);
 	  		  HAL_GPIO_WritePin(MOTOR1B_GPIO_Port, MOTOR1B_Pin, GPIO_PIN_RESET);
 	  	 	  }
-	  	  else if (outputPWM[0] > 0){
+	  	  else if (outputPWM[1] > 0){
 	   		  HAL_GPIO_WritePin(MOTOR1A_GPIO_Port, MOTOR1A_Pin, GPIO_PIN_RESET);
 	   		  HAL_GPIO_WritePin(MOTOR1B_GPIO_Port, MOTOR1B_Pin, GPIO_PIN_SET);
 	   	  }
 	   	  //==============================================================================
-	   	  if (outputPWM[1] < 0){
+	   	  if (outputPWM[2] < 0){
 	   		  HAL_GPIO_WritePin(MOTOR2A_GPIO_Port, MOTOR2A_Pin, GPIO_PIN_SET);
 	   		  HAL_GPIO_WritePin(MOTOR2B_GPIO_Port, MOTOR2B_Pin, GPIO_PIN_RESET);
 	   	  }
-	   	  else if (outputPWM[1] > 0){
+	   	  else if (outputPWM[2] > 0){
 	   		  HAL_GPIO_WritePin(MOTOR2A_GPIO_Port, MOTOR2A_Pin, GPIO_PIN_RESET);
 	   		  HAL_GPIO_WritePin(MOTOR2B_GPIO_Port, MOTOR2B_Pin, GPIO_PIN_SET);
 	   	  }
 	   	  //==============================================================================
-	   	  if (outputPWM[2] < 0){
+	   	  if (outputPWM[0] < 0){
 	   		  HAL_GPIO_WritePin(MOTOR3A_GPIO_Port, MOTOR3A_Pin, GPIO_PIN_SET);
 	   		  HAL_GPIO_WritePin(MOTOR3B_GPIO_Port, MOTOR3B_Pin, GPIO_PIN_RESET);
 	   	  }
-	   	  else if (outputPWM[2] > 0)
+	   	  else if (outputPWM[0] > 0)
 	   	  {
 	   		  HAL_GPIO_WritePin(MOTOR3A_GPIO_Port, MOTOR3A_Pin, GPIO_PIN_RESET);
 	   		  HAL_GPIO_WritePin(MOTOR3B_GPIO_Port, MOTOR3B_Pin, GPIO_PIN_SET);
@@ -361,9 +361,9 @@ void Startout_motorTask(void const * argument)
 	   		  outputPWM[2] = 0;
 	   	  }
 
-	   	  __HAL_TIM_SET_COMPARE(&htim9, TIM_CHANNEL_1, abs(outputPWM[0]));
-	   	  __HAL_TIM_SET_COMPARE(&htim9, TIM_CHANNEL_2, abs(outputPWM[1]));
-	   	  __HAL_TIM_SET_COMPARE(&htim12, TIM_CHANNEL_2, abs(outputPWM[2]));
+	   	  __HAL_TIM_SET_COMPARE(&htim9, TIM_CHANNEL_1, abs(outputPWM[1]));
+	   	  __HAL_TIM_SET_COMPARE(&htim9, TIM_CHANNEL_2, abs(outputPWM[2]));
+	   	  __HAL_TIM_SET_COMPARE(&htim12, TIM_CHANNEL_2, abs(outputPWM[0]));
 
 	   	  osDelay(1);
   }
