@@ -75,7 +75,7 @@ float quat_y;
 float quat_z;
 
 //====================ODOMETRY=========================//
-int odometry[2] = {32768, 32768};
+int odometry[2];
 float x_buffer_position = 0, y_buffer_position = 0;
 float x_offset_position = 0, y_offset_position = 0;
 float x_position = 0, y_position = 0;
@@ -88,9 +88,6 @@ float y_velocity;
 float angular_velocity;
 
 //================COMMMUNICATION ROSSERIAL================//
-unsigned long int t0_ros;
-unsigned long int t1_ros;
-
 uint32_t tick;
 uint32_t test;
 

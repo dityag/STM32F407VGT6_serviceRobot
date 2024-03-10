@@ -37,16 +37,33 @@
 
 #include "geometry_msgs/TransformStamped.h"
 
+//====================IMU BNO055=====================//
+extern char imu_buf[32];
+extern float euler_x;
+extern float euler_y;
+extern float euler_z;
+extern float quat_w;
+extern float quat_x;
+extern float quat_y;
+extern float quat_z;
+
 namespace tf
 {
 
 static inline geometry_msgs::Quaternion createQuaternionFromYaw(double yaw)
 {
+//  geometry_msgs::Quaternion q;
+//  q.x = 0;
+//  q.y = 0;
+//  q.z = sin(yaw * 0.5);
+//  q.w = cos(yaw * 0.5);
+//  return q;
+
   geometry_msgs::Quaternion q;
-  q.x = 0;
-  q.y = 0;
-  q.z = sin(yaw * 0.5);
-  q.w = cos(yaw * 0.5);
+  q.x = quat_x;
+  q.y = quat_y;
+  q.z = quat_z;
+  q.w = quat_w;
   return q;
 }
 

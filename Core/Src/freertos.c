@@ -80,6 +80,7 @@ extern float x_velocity;
 extern float y_velocity;
 extern float angular_velocity;
 
+//================COMMMUNICATION ROSSERIAL================//
 extern uint32_t tick;
 
 /* USER CODE END Variables */

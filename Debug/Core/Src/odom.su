@@ -71,7 +71,7 @@ c:\st\stm32cubeide_1.12.0\stm32cubeide\plugins\com.st.stm32cube.ide.mcu.external
 ../Core/Inc/tf/transform_broadcaster.h:47:3:tf::TransformBroadcaster::TransformBroadcaster()	16	static
 ../Core/Inc/tf/transform_broadcaster.h:49:8:void tf::TransformBroadcaster::init(ros::NodeHandle&)	16	static
 ../Core/Inc/tf/transform_broadcaster.h:54:8:void tf::TransformBroadcaster::sendTransform(geometry_msgs::TransformStamped&)	16	static
-../Core/Inc/tf/tf.h:43:41:geometry_msgs::Quaternion tf::createQuaternionFromYaw(double)	24	static
+../Core/Inc/tf/tf.h:53:41:geometry_msgs::Quaternion tf::createQuaternionFromYaw(double)	24	static
 ../Core/Src/odom.cpp:24:1:Odometer::Odometer(float, float)	24	static
 ../Core/Src/odom.cpp:32:6:void Odometer::setupPubs(ros::NodeHandle&)	16	static
 ../Core/Src/odom.cpp:38:6:void Odometer::update_publish(ros::Time, float, float, float)	40	static

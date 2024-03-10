@@ -71,7 +71,7 @@ tfMessage.h:59:26:virtual const char* tf::tfMessage::getMD5()	1
 transform_broadcaster.h:47:3:tf::TransformBroadcaster::TransformBroadcaster()	1
 transform_broadcaster.h:49:8:void tf::TransformBroadcaster::init(ros::NodeHandle&)	1
 transform_broadcaster.h:54:8:void tf::TransformBroadcaster::sendTransform(geometry_msgs::TransformStamped&)	1
-tf.h:43:41:geometry_msgs::Quaternion tf::createQuaternionFromYaw(double)	1
+tf.h:53:41:geometry_msgs::Quaternion tf::createQuaternionFromYaw(double)	1
 odom.cpp:24:1:Odometer::Odometer(float, float)	1
 odom.cpp:32:6:void Odometer::setupPubs(ros::NodeHandle&)	1
 odom.cpp:38:6:void Odometer::update_publish(ros::Time, float, float, float)	1
