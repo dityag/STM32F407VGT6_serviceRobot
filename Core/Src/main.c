@@ -74,14 +74,11 @@ float quat_x;
 float quat_y;
 float quat_z;
 
+float gyro_angle_w = 90.0, gyro_offset_w = 90.0;
+float gyro_angle_z = 90.0, gyro_offset_z = 90.0;
+
 //====================ODOMETRY=========================//
 int odometry[2];
-float x_buffer_position = 0, y_buffer_position = 0;
-float x_offset_position = 0, y_offset_position = 0;
-float x_position = 0, y_position = 0;
-
-float gyro_buffer, gyro_offset = 90;
-float gyro_angle = 90, gyro_radian = 1.5707963268; // 1/2*phi
 
 float x_velocity;
 float y_velocity;
@@ -89,7 +86,7 @@ float angular_velocity;
 
 //================COMMMUNICATION ROSSERIAL================//
 uint32_t tick;
-uint32_t test;
+float dummy;
 
 /* USER CODE END PD */
 

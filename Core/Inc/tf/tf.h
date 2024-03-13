@@ -50,12 +50,12 @@ extern float quat_z;
 namespace tf
 {
 
-static inline geometry_msgs::Quaternion createQuaternionFromYaw(double yaw)
+static inline geometry_msgs::Quaternion createQuaternionFromYaw(double yaw, double z)
 {
 //  geometry_msgs::Quaternion q;
 //  q.x = 0;
 //  q.y = 0;
-//  q.z = sin(yaw * 0.5);
+//  q.z = sin(z * 0.5);
 //  q.w = cos(yaw * 0.5);
 //  return q;
 

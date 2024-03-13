@@ -75,6 +75,9 @@ extern float quat_x;
 extern float quat_y;
 extern float quat_z;
 
+extern float gyro_angle_w, gyro_offset_w;
+extern float gyro_angle_z, gyro_offset_z;
+
 //===============ODOMETRY================//
 extern float x_velocity;
 extern float y_velocity;
@@ -235,6 +238,23 @@ void Startjoys_imuTask(void const * argument)
 		  memcpy(&quat_z, imu_buf + 27, 4);
 		  HAL_GPIO_WritePin(GPIOE, GPIO_PIN_13, GPIO_PIN_SET);
 		  HAL_GPIO_WritePin(GPIOE, GPIO_PIN_14, GPIO_PIN_SET);
+
+		  gyro_angle_w = (gyro_offset_w - euler_x);
+
+		  while (gyro_angle_w > 180)
+			  gyro_angle_w -= 360;
+		  while (gyro_angle_w < -180)
+			  gyro_angle_w += 360;
+
+		  gyro_angle_z = (gyro_offset_z - euler_x);
+		  while (gyro_angle_z > 180)
+			  gyro_angle_z -= 360;
+		  while (gyro_angle_z < -180)
+			  gyro_angle_z += 360;
+
+		  gyro_angle_w = gyro_angle_w * 0.01745329252;
+		  gyro_angle_z = gyro_angle_z * 0.01745329252;
+
 	  }else{
 		  HAL_GPIO_WritePin(GPIOE, GPIO_PIN_13, GPIO_PIN_RESET);
 		  HAL_GPIO_WritePin(GPIOE, GPIO_PIN_14, GPIO_PIN_RESET);

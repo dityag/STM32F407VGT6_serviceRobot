@@ -12,7 +12,20 @@
 char base_link[] = "base_link";
 char odom[]      = "odom";
 
-extern uint32_t test;
+extern float dummy;
+
+//====================IMU BNO055=====================//
+extern char imu_buf[32];
+extern float euler_x;
+extern float euler_y;
+extern float euler_z;
+extern float quat_w;
+extern float quat_x;
+extern float quat_y;
+extern float quat_z;
+
+extern float gyro_angle_w, gyro_offset_w;
+extern float gyro_angle_z, gyro_offset_z;
 
 nav_msgs::Odometry odomMsg;
 ros::Publisher     odom_pub(odom, &odomMsg);
@@ -39,6 +52,7 @@ void Odometer::update_publish(ros::Time current_time, const float odoInterval,
                               const float distLeft, const float distRight) {
 
   float vel_x;
+  float vel_y;
   float vel_theta;
 
   update_odom(odoInterval, distLeft, distRight, vel_x, vel_theta);
@@ -73,7 +87,8 @@ void Odometer::update_odom(const float odoInterval, const float distLeft,const f
 
     _cur_x += r * (sin(d_theta + _cur_theta) - sin(_cur_theta));
     _cur_y -= r * (cos(d_theta + _cur_theta) - cos(_cur_theta));
-    _cur_theta = normalize_angle(_cur_theta + d_theta);
+//    _cur_theta = normalize_angle(_cur_theta + d_theta);
+    _cur_theta = gyro_angle_z;
   }
 
   vel_x     = dist    / odoInterval;
@@ -117,10 +132,11 @@ void Odometer::publish_odom(ros::Time current_time, const float vx, const float 
     odomMsg.header.frame_id       = odom;
     odomMsg.child_frame_id        = base_link;
 
-    odomMsg.pose.pose.position.x  = _cur_x;
-    odomMsg.pose.pose.position.y  = _cur_y;
+    odomMsg.pose.pose.position.x  = _cur_y;
+    odomMsg.pose.pose.position.y  = (_cur_x) * -1;
     odomMsg.pose.pose.position.z  = 0.0;
-    odomMsg.pose.pose.orientation = tf::createQuaternionFromYaw(_cur_theta);
+//    odomMsg.pose.pose.orientation = tf::createQuaternionFromYaw(_cur_theta);
+    odomMsg.pose.pose.orientation = tf::createQuaternionFromYaw(gyro_angle_w, gyro_angle_z);
 
     odomMsg.twist.twist.linear.x  = vx;
     odomMsg.twist.twist.linear.y  = 0;
@@ -135,10 +151,11 @@ void Odometer::publish_odom(ros::Time current_time, const float vx, const float 
     t.header.frame_id         = odom;
     t.child_frame_id          = base_link;
 
-    t.transform.translation.x = _cur_x;
-    t.transform.translation.y = _cur_y;
+    t.transform.translation.x = _cur_y;
+    t.transform.translation.y = (_cur_x) * -1;
     t.transform.translation.z = 0.0;
-    t.transform.rotation      = tf::createQuaternionFromYaw(-_cur_theta);
+//    t.transform.rotation      = tf::createQuaternionFromYaw(-_cur_theta);
+    t.transform.rotation      = tf::createQuaternionFromYaw(gyro_angle_w, gyro_angle_z);
 
 
     tfBroadcaster.sendTransform(t);

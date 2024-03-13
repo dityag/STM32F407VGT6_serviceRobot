@@ -71,19 +71,19 @@ tfMessage.h:59:26:virtual const char* tf::tfMessage::getMD5()	1
 transform_broadcaster.h:47:3:tf::TransformBroadcaster::TransformBroadcaster()	1
 transform_broadcaster.h:49:8:void tf::TransformBroadcaster::init(ros::NodeHandle&)	1
 transform_broadcaster.h:54:8:void tf::TransformBroadcaster::sendTransform(geometry_msgs::TransformStamped&)	1
-tf.h:53:41:geometry_msgs::Quaternion tf::createQuaternionFromYaw(double)	1
-odom.cpp:24:1:Odometer::Odometer(float, float)	1
-odom.cpp:32:6:void Odometer::setupPubs(ros::NodeHandle&)	1
-odom.cpp:38:6:void Odometer::update_publish(ros::Time, float, float, float)	1
-odom.cpp:49:6:void Odometer::update_odom(float, float, float, float&, float&)	3
-odom.cpp:87:6:void Odometer::update_kinematics(float, float, float&, float&)	3
+tf.h:53:41:geometry_msgs::Quaternion tf::createQuaternionFromYaw(double, double)	1
+odom.cpp:37:1:Odometer::Odometer(float, float)	1
+odom.cpp:45:6:void Odometer::setupPubs(ros::NodeHandle&)	1
+odom.cpp:51:6:void Odometer::update_publish(ros::Time, float, float, float)	1
+odom.cpp:63:6:void Odometer::update_odom(float, float, float, float&, float&)	3
+odom.cpp:102:6:void Odometer::update_kinematics(float, float, float&, float&)	3
 msg.h:46:7:constexpr ros::Msg& ros::Msg::operator=(ros::Msg&&)	1
 Quaternion.h:12:9:constexpr geometry_msgs::Quaternion& geometry_msgs::Quaternion::operator=(geometry_msgs::Quaternion&&)	1
-odom.cpp:114:6:void Odometer::publish_odom(ros::Time, float, float)	1
-odom.cpp:133:8:void Odometer::broadcastTf(ros::Time)	1
-odom.cpp:148:9:float Odometer::normalize_angle(float)	3
+odom.cpp:129:6:void Odometer::publish_odom(ros::Time, float, float)	1
+odom.cpp:149:8:void Odometer::broadcastTf(ros::Time)	1
+odom.cpp:165:9:float Odometer::normalize_angle(float)	3
 msg.h:188:15:static void ros::Msg::varToArr(A, V) [with A = unsigned char*; V = long unsigned int]	2
 msg.h:196:15:static void ros::Msg::arrToVar(V&, A) [with V = long unsigned int; A = unsigned char*]	2
 node_handle.h:390:8:bool ros::NodeHandle_<Hardware, MAX_SUBSCRIBERS, MAX_PUBLISHERS, INPUT_SIZE, OUTPUT_SIZE>::advertise(ros::Publisher&) [with Hardware = STM32Hardware; int MAX_SUBSCRIBERS = 25; int MAX_PUBLISHERS = 25; int INPUT_SIZE = 2048; int OUTPUT_SIZE = 2048]	3
-odom.cpp:156:3:void __static_initialization_and_destruction_0(int, int)	3
-odom.cpp:156:3:cpp)	1
+odom.cpp:173:3:void __static_initialization_and_destruction_0(int, int)	3
+odom.cpp:173:3:cpp)	1

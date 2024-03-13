@@ -25,7 +25,6 @@ ros::NodeHandle  nh;
 //const float meterPerTick = (0.13 * 3.1415) / (75.0 * 64.0); // Thumper
 
 extern uint32_t tick;
-extern uint32_t test;
 
 // These global variables are used by the PID library.
 // TODO Kp, Ki and Kd should be parameters
@@ -189,7 +188,6 @@ void loop(void) {
     encoderLeftLastValueOdo  = encLeft;
     encoderRightLastValueOdo = encRight;
     timeLastOdo = curMillis;
-    test++;
     }
 
 
@@ -209,10 +207,12 @@ void cmd_velCallback(const geometry_msgs::Twist& twist_msg) {
   //    angular.y is the rotation about the z or vertical
   //              axis in radians per second.
   //
+
   vel_x   = twist_msg.linear.x;
   vel_y   = twist_msg.linear.y;
   vel_th  = twist_msg.angular.z;
 
+  HAL_GPIO_WritePin(LED1_GPIO_Port, LED1_Pin, GPIO_PIN_SET);
   // This is a "hack".  It turns ou the motors have a minimum
   // speed because of internal friction.   If the commanded speed is
   // below a threshold we replace the commanded speed with zero.
